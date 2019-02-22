@@ -76,17 +76,53 @@ class SentencesIterator(object):
                     sentence = row[self.categories.index("content")].split()
                     # print(sentence)
                     yield sentence
-    
-
+ 
+def read_input(input_file):
+    """This method reads the input file which is in gzip format"""
+ 
+    logging.info("reading file {0}...this may take a while".format(input_file))
+    with gzip.open(input_file, 'rb') as f:
+        for i, line in enumerate(f):
+ 
+            if (i % 10000 == 0):
+                logging.info("read {0} reviews".format(i))
+            # do some pre-processing and return list of words for each review
+            # text
+            yield gensim.utils.simple_preprocess(line)
+            
+            
 # sentences = SentencesIterator('data_scrapping/tweets_2019-01-04_2019-01-30.csv')
 sentences = SentencesIterator('data_scrapping/total_tweets.csv')
+# sentences = read_input('data_scrapping/OpinRank-master.zip')
 
 # --------------------------------------------------------------------------------------------
-#           TRAINING THE MODEL
+#           TRAINING & SAVING DIFFERENT MODELS
 # --------------------------------------------------------------------------------------------
+bigram_transformer = gensim.models.Phrases(sentences)
 
-model = gensim.models.Word2Vec(sentences, min_count=10, size=200, workers=4)
+"""model1 = gensim.models.Word2Vec(sentences)
+model1.save('model1')
 
+model2 = gensim.models.Word2Vec(sentences, min_count=10, size=200, workers=4)
+model2.save('model2')
+
+
+model3 = gensim.models.Word2Vec(bigram_transformer[sentences])
+model3.save('model3')
+
+model4 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=10, size=200, workers=4)
+model4.save('model4')
+
+model5 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=2, size=200, workers=4)
+model5.save('model5')
+
+model6 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, size=300, workers=4)
+model6.save('model6')"""
+
+# model7 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, size=300, workers=4)
+# model7.save('model7')
+
+model = gensim.models.Word2Vec.load('model6')
 
 # --------------------------------------------------------------------------------------------
 #           TESTING THE MODEL
@@ -95,8 +131,9 @@ model = gensim.models.Word2Vec(sentences, min_count=10, size=200, workers=4)
 print('Accuracy : ', model.wv.accuracy('test_questions.txt'))
 print('Similarity for "sing" : ', model.wv.most_similar(positive=['sing']))
 print('Similarity for "she" : ', model.wv.most_similar(positive=['she']))
-print('Similarity for "he" : ', model.wv.most_similar(positive=['love']))
+print('Similarity for "he" : ', model.wv.most_similar(positive=['he']))
 print('Similarity for "he" and "she" : ', model.wv.most_similar(positive=['he', 'she']))
+print('Similarity for "love" : ', model.wv.most_similar(positive=['love']))
 
 # --------------------------------------------------------------------------------------------
 #           TESTING THE MODEL
@@ -123,18 +160,20 @@ def compare_avg_sentence_vectors(v1, v2):
     return 1 - abs(sum(v1 - v2))
 
 vocab = model.wv.vocab
+# print(vocab.keys(), len(vocab))
+print(len(vocab))
 
 #get average vector for sentence 1
 sentence_1 = "I absolutely love The Voice"
-sentence_1_avg_vector = avg_sentence_vector(sentence_1.split(), model, 200, vocab)
+sentence_1_avg_vector = avg_sentence_vector(sentence_1.split(), model, model.trainables.layer1_size, vocab)
 
 #get average vector for sentence 2
 sentence_2 = "love"
-sentence_2_avg_vector = avg_sentence_vector(sentence_2.split(), model, 200, vocab)
+sentence_2_avg_vector = avg_sentence_vector(sentence_2.split(), model, model.trainables.layer1_size, vocab)
 
 #get average vector for sentence 2
-sentence_3 = "I love The Voice"
-sentence_3_avg_vector = avg_sentence_vector(sentence_3.split(), model, 200, vocab)
+sentence_3 = "I hate The Voice"
+sentence_3_avg_vector = avg_sentence_vector(sentence_3.split(), model, model.trainables.layer1_size, vocab)
 
 # print(sentence_1_avg_vector - sentence_2_avg_vector)
 print(compare_avg_sentence_vectors(sentence_1_avg_vector, sentence_2_avg_vector))
@@ -144,3 +183,44 @@ print(compare_avg_sentence_vectors(sentence_1_avg_vector, sentence_3_avg_vector)
 
 # print(sentence_1_avg_vector - sentence_3_avg_vector)
 print(compare_avg_sentence_vectors(sentence_2_avg_vector, sentence_3_avg_vector))
+
+
+# --------------------------------------------------------------------------------------------
+#           APPLYING THE MODEL
+# --------------------------------------------------------------------------------------------
+
+def apply_model_to_sentence(sentence, model):
+    v1 = avg_sentence_vector(sentence.split(), model, model.trainables.layer1_size, model.wv.vocab)
+    v2 = avg_sentence_vector("I love this", model, model.trainables.layer1_size, model.wv.vocab)
+    
+    return compare_avg_sentence_vectors(v1, v2)
+
+def apply_model_to_csv(filePath, fileName, model):
+    with open(filePath + 'results-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
+        with open(filePath + fileName, encoding="utf8") as fileToRead:
+            csvReader = csv.reader(fileToRead, delimiter=',')
+            firstLine = True
+            for row in csvReader:
+                if firstLine:
+                    firstLine = False
+                    writer = csv.DictWriter(resultFile, fieldnames=row + ['word2vec_result'])
+                    writer.writeheader()
+                else:
+                    tweet_info = {}
+                    tweet_info['tweet_id'] = row[0]
+                    tweet_info['user_pseudo'] = row[1]
+                    tweet_info['user_id'] = row[2]
+                    tweet_info['user_name'] = row[3]
+                    tweet_info['date_and_time'] = row[4]
+                    tweet_info['content'] = row[5]
+                    tweet_info['nb_replies'] = row[6]
+                    tweet_info['nb_retweets'] = row[7]
+                    tweet_info['nb_jaime'] = row[8]
+                    tweet_info['word2vec_result'] = apply_model_to_sentence(row[5], model)
+                    print(tweet_info)
+                    writer.writerow(tweet_info)
+                    
+apply_model_to_csv('data_scrapping/', 'total_tweets.csv', model)
+
+
+
