@@ -189,6 +189,7 @@ print(compare_avg_sentence_vectors(sentence_2_avg_vector, sentence_3_avg_vector)
 #           APPLYING THE MODEL
 # --------------------------------------------------------------------------------------------
 
+# ------------ Méthode à faire EVOLUER pour avoir un modèle fonctionnel puis optimisé --------
 def apply_model_to_sentence(sentence, model):
     v1 = avg_sentence_vector(sentence.split(), model, model.trainables.layer1_size, model.wv.vocab)
     v2 = avg_sentence_vector("I love this", model, model.trainables.layer1_size, model.wv.vocab)
@@ -217,7 +218,7 @@ def apply_model_to_csv(filePath, fileName, model):
                     tweet_info['nb_retweets'] = row[7]
                     tweet_info['nb_jaime'] = row[8]
                     tweet_info['word2vec_result'] = apply_model_to_sentence(row[5], model)
-                    print(tweet_info)
+                    # print(tweet_info)
                     writer.writerow(tweet_info)
                     
 apply_model_to_csv('data_scrapping/', 'total_tweets.csv', model)
