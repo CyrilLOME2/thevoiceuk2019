@@ -4,7 +4,7 @@ import re
 import os
 from math import log
 
-emoji = open('emoji.txt','w', encoding = "utf-8")
+#emoji = open('emoji.txt','w', encoding = "utf-8")
 
 
 def importCoachs ():
@@ -70,6 +70,7 @@ def trim_tweet (tweet, Lcoach = [], Lcandidate = []):
                         L_clean.append("thevoice")
                     else :
                         L_clean.append("candidate")
+                        no_tag = False
                 else :
                     L_clean.append(t[i])
                     
@@ -96,7 +97,7 @@ def trim_tweet (tweet, Lcoach = [], Lcandidate = []):
     for l in L_clean:
         tweet = tweet + l + " "
     tweet_emojis = ''.join([tweet[i] for i in range(len(tweet)) if not (tweet[i] in ("0.123456789abcdefghijklmnopqrstuvwxyz ,!:?;']ABCDEFGHIJKLMNOPQRSTUVWXYZ()<>-_&%£’áóé~èç$€"+'"'))])
-    emoji.write(tweet_emojis)
+    #emoji.write(tweet_emojis)
     tweet = ''.join(re.findall(r'[0.123456789abcdefghijklmnopqrstuvwxyz !:?;]', tweet))
     tweetValide = (len(tweet) < 15 or len(re.findall(r'[éèàùã]', tweet))>0 or no_tag or two_tags)
     return tweet, tweetValide, numCandidate
@@ -104,6 +105,7 @@ def trim_tweet (tweet, Lcoach = [], Lcandidate = []):
 def trim_data (Data,name_new_file = file[:-4]+"_clean.csv", Lcoach = []):
     """Epure les tweets, donne le score d'importance et écrit dans le fichier"""
     # tweet_id,user_id,user_pseudo,user_name,date_and_time,content,nb_replies,nb_retweets,nb_jaime
+    print(name_new_file)
     if '2019' in name_new_file :
         fcandidate = open('Cadidate2019.txt', 'r', encoding = 'utf-8')
         Lcandidate = fcandidate.readlines()
