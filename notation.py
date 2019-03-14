@@ -14,6 +14,7 @@ import gensim, logging
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 import numpy as np
 import csv
+import torch
 
 # --------------------------------------------------------------------------------------------
 #           PREPARAING THE DATA
@@ -126,8 +127,8 @@ def create_model():
     # model7 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, size=300, workers=4)
     # model7.save('model7')
     
-    model8 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, window=7, size=300, workers=4)
-    model8.save('model8')
+    # model8 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, window=7, size=300, workers=4)
+    # model8.save('model8')
     
     model = gensim.models.Word2Vec.load('model8')
     return model
@@ -210,14 +211,14 @@ def apply_model_to_csv(filePath, fileName, modelTweetsFilePath, modelTweetsFileN
     with open(filePath + 'results-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
         with open(filePath + fileName, encoding="utf8") as fileToRead:
             csvReader = csv.reader(fileToRead, delimiter=',')
-            #modelTweetsCsvReader.pop(0)
             firstLine = True
             writeHeaders = True
             for row in csvReader:
                 if not firstLine:
                     tweet_info = {}
-                    tweet_info['tweet_id'] = row[0]
-                    tweet_info['user_pseudo'] = row[1]
+                    tweet_info['id_tweet'] = row[0]
+                    tweet_info['id_candidate'] = row[1]
+                    tweet_info['sum_rt_like_com'] = row[1]
                     
                     count = 0
                     with open(modelTweetsFilePath + modelTweetsFileName, encoding="utf8") as modelTweetsFile:
@@ -228,30 +229,74 @@ def apply_model_to_csv(filePath, fileName, modelTweetsFilePath, modelTweetsFileN
                             count +=1
                         
                     if writeHeaders:
-                        fieldNames = ["tweet_id", "user_pseudo"] + ['w2v_' + str(i-1) for i in range(1, count)]
-                        print(fieldNames)
+                        fieldNames = ["id_tweet", "id_candidate", "sum_rt_like_com"] + ['w2v_' + str(i-1) for i in range(1, count)]
                         writer = csv.DictWriter(resultFile, fieldnames=fieldNames)
                         writer.writeheader()
                         writeHeaders = False
                 
-                    print(tweet_info)
                     writer.writerow(tweet_info)
                     
-                    """tweet_info['user_id'] = row[2]
-                    tweet_info['user_name'] = row[3]
-                    tweet_info['date_and_time'] = row[4]
-                    tweet_info['content'] = row[5]
-                    tweet_info['nb_replies'] = row[6]
-                    tweet_info['nb_retweets'] = row[7]
-                    tweet_info['nb_jaime'] = row[8]
-                    tweet_info['word2vec_result'] = apply_model_to_sentence(row[5], model)"""
                 firstLine = False
 
-                    # 
                     
-def test_apply_model_to_csv(fileDirectory, fileName, model):
+def test_apply_model_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName, model):
     #apply_model_to_csv('data_scrapping/', 'total_tweets.csv', model)
-    apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', model)
+    #apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', model)
+    apply_model_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName, model)
 
 model = create_model()
 apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', model)
+
+
+# --------------------------------------------------------------------------------------------
+#           KNN MODEL TO GET THE NOTATION
+# --------------------------------------------------------------------------------------------
+
+def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName, K):
+    print(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName)
+    with open(fileDirectory + 'knn-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
+        with open(fileDirectory + fileName, encoding="utf8") as fileToRead:
+            csvReader = csv.reader(fileToRead, delimiter=',')
+            firstLine = True
+            writeHeaders = True
+            for row in csvReader:
+                if not firstLine:
+                    tweet_info = {}
+                    tweet_info['id_tweet'] = row[0]
+                    tweet_info['id_candidate'] = row[1]
+                    tweet_info['sum_rt_like_com'] = row[2]
+                    
+                    tweetW2VTensor = torch.zeros(len(row) - 3)
+
+                    for i in range(3, len(row)):
+                        tweetW2VTensor[i-3] = float(row[i])
+                        
+                    sortedTweetW2VTensor, indices = torch.sort(tweetW2VTensor, descending=True)
+                    knnIndices = indices[0:K]
+                    
+                    with open(modelTweetsFilePath + modelTweetsFileName, encoding="utf8") as resultFileToRead:
+                        resultFileReader = csv.reader(resultFileToRead, delimiter=',')
+                        notationsList = []
+
+                        for row2 in resultFileReader:
+                            try:
+                                notationsList += [int(row2[2])]
+                            except ValueError:
+                                pass
+
+                        for i in range(0, K):
+                            index = knnIndices.item()
+                            tweet_info['notation_' + str(i)] = notationsList[index]
+    
+
+                    if writeHeaders:
+                        fieldNames = ["id_tweet", "id_candidate", "sum_rt_like_com"] + ['notation_' + str(i) for i in range(0, K)]
+                        writer = csv.DictWriter(resultFile, fieldnames=fieldNames)
+                        writer.writeheader()
+                        writeHeaders = False
+                
+                    writer.writerow(tweet_info)
+                    
+                firstLine = False
+                
+apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 1)
