@@ -2,25 +2,16 @@ path = "data_scrapping/"
 file = "tweets_2017-01-05_2017-04-10.csv"
 import re
 import os
+from math import log
 
-def read_csv(path, file, nb_lines = 10):
-    """Premier jet, utiliser l'autre"""
-    f = open(path+file,'r')
-    # tweet_id,user_id,user_pseudo,user_name,date_and_time,content,nb_replies,nb_retweets,nb_jaime
-    Raw_data = f.readlines()
-    
-    Data = []
-    nb_info = len(Raw_data[0][:-1].split(','))
-    
-    for i in range(1,min(len(Raw_data), nb_lines)):
-        data = Raw_data[i][:-1].split(',') #trim \n, split
-        tweet = ''
-        for j in range(5, 5+ len(data)-nb_info): #gestion des virgules dans le tweet
-            tweet = tweet + data[j]
-        Data.append(data[:5]+[tweet]+data[6+ len(data)-nb_info:])
+emoji = open('emoji.txt','w', encoding = "utf-8")
 
+
+def importCoachs ():
+    f = open("coachs.txt","r", encoding = 'utf-8')
+    Lcoach = f.readlines()
     f.close()
-    return Data
+    return [Lcoach[i][:-1] for i in range(len(Lcoach))]
 
 def read_csv_unknown(path, file, nb_lines = 10000):
     """Fonction qui évite les caractères buggés"""
@@ -54,44 +45,52 @@ def affiche_tweet(Data,nb = 10):
     for i in range(min(nb,len(Data))):
         print(Data[i][5])
 
-def trim_tweet (tweet):
+def trim_tweet (tweet, Lcoach = []):
     """ Flag false -> No problem,
         Flag true  -> Destruction du tweet """
-    no_tag = True
+    no_tag, two_tags = True, False
     t = tweet.split()
     L_clean = []
     for i in range(len(t)):
-        if (t[i][:4]!="http" and t[i][:1]!="#"):
-            if t[i][0] == "@":
-                #                       WARNING,
-                #   Comme j'ai pas la liste des gens, je peux pas encore identifier
-                L_clean.append("thevoice" if t[i][:9]== "@thevoice" else "person")
-                no_tag = False
+        if not ("http" in t[i] or "#" in t[i]):
+            if "@" in t[i] :
+                if t[i] in Lcoach :
+                    L_clean.append("coach")
+                elif t[i][:9]== "@thevoice" :
+                    L_clean.append("thevoice")
+                else :
+                    L_clean.append("candidate")
+                    if not(no_tag) :
+                        two_tags = True
+                    no_tag = False
             else :
                 L_clean.append(t[i])
     
     tweet = ''
     for l in L_clean:
         tweet = tweet + l + " "
-    #emoji = re.findall(r'[^\w\s,!:?;]', tweet)
+    tweet_emojis = ''.join([tweet[i] for i in range(len(tweet)) if not (tweet[i] in ("0.123456789abcdefghijklmnopqrstuvwxyz ,!:?;']ABCDEFGHIJKLMNOPQRSTUVWXYZ()<>-_&%£’áóé~èç$€"+'"'))])
+    emoji.write(tweet_emojis)
     tweet = ''.join(re.findall(r'[0.123456789abcdefghijklmnopqrstuvwxyz ,!:?;]', tweet.lower()))
-    return tweet, len(tweet) < 10 or len(re.findall(r'[éèàùã]', tweet))>0 or no_tag
+    return tweet, (len(tweet) < 15 or len(re.findall(r'[éèàùã]', tweet))>0 or no_tag or two_tags)
 
-def trim_data (Data,name_new_file = file[:-4]+"_clean.csv"):
+def trim_data (Data,name_new_file = file[:-4]+"_clean.csv", Lcoach = []):
     """Epure les tweets, donne le score d'importance et écrit dans le fichier"""
     # tweet_id,user_id,user_pseudo,user_name,date_and_time,content,nb_replies,nb_retweets,nb_jaime
     f = open("Cleaned/"+name_new_file,"w", encoding="utf-8")
+    f.write("idTweet, clean_tweet, scoreImportance, idCandidat\n")
     for i in range(len(Data)):
-        clean_tweet, b = trim_tweet(Data[i][5])
+        clean_tweet, b = trim_tweet(Data[i][5], Lcoach)
         if not b :
-            score_impor = int(Data[i][6])+int(Data[i][7])+int(Data[i][8])
+            score_impor = int(log(2+int(Data[i][6])+int(Data[i][7])+int(Data[i][8]),10))
             f.write(Data[i][0]+','+clean_tweet+','+str(score_impor)+'\n')
     f.close()
 
 def clean_file (path, filename):
     """Nettoie tous les tweets d'un fichier"""
     Data = read_csv_unknown(path, filename)
-    trim_data(Data, filename[:-4]+"_clean.csv")
+    Lcoach = importCoachs()
+    trim_data(Data, filename[:-4]+"_clean.csv",Lcoach)
 
 def CLEAN_DIR (path):
     """Nettoie tous les tweets d'un dossier"""
@@ -99,4 +98,7 @@ def CLEAN_DIR (path):
         if filename.endswith(".csv"):
             Data = read_csv_unknown(path, filename)
             trim_data(Data, filename[:-4]+"_clean.csv")
-
+    try :
+        emoji.close()
+    except :
+        pass
