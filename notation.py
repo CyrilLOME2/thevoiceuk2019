@@ -167,7 +167,8 @@ def avg_sentence_vector(words, model, num_features, index2word_set):
     return featureVec
 
 def compare_avg_sentence_vectors(v1, v2):
-    return 1 - abs(sum(v1 - v2))
+    #return 1 - abs(sum(v1 - v2))
+    return abs(sum(v1 - v2))
 
 def test_sentence_model():
     vocab = model.wv.vocab
@@ -254,7 +255,7 @@ apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', 'Cleane
 
 def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName, K):
     print(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName)
-    with open(fileDirectory + 'knn-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
+    with open(fileDirectory + str(K) + 'nn-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
         with open(fileDirectory + fileName, encoding="utf8") as fileToRead:
             csvReader = csv.reader(fileToRead, delimiter=',')
             firstLine = True
@@ -271,7 +272,7 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
                     for i in range(3, len(row)):
                         tweetW2VTensor[i-3] = float(row[i])
                         
-                    sortedTweetW2VTensor, indices = torch.sort(tweetW2VTensor, descending=True)
+                    sortedTweetW2VTensor, indices = torch.sort(tweetW2VTensor, descending=False)
                     knnIndices = indices[0:K]
                     
                     with open(modelTweetsFilePath + modelTweetsFileName, encoding="utf8") as resultFileToRead:
@@ -283,9 +284,11 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
                                 notationsList += [int(row2[2])]
                             except ValueError:
                                 pass
+                            
+                        knnIndices = knnIndices.tolist()
 
                         for i in range(0, K):
-                            index = knnIndices.item()
+                            index = knnIndices[i]
                             tweet_info['notation_' + str(i)] = notationsList[index]
     
 
@@ -299,4 +302,27 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
                     
                 firstLine = False
                 
-apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 1)
+#apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 1)
+apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 3)
+
+
+# --------------------------------------------------------------------------------------------
+#           FINAL NOTATION CALCUL
+# --------------------------------------------------------------------------------------------
+
+def calculate_final_notation(fileDirectory, fileName):
+    with open(fileDirectory + 'final_notation-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
+        with open(fileDirectory + fileName, encoding="utf8") as fileToRead:
+            csvReader = csv.reader(fileToRead, delimiter=',')
+            candidates = {}
+            for row in csvReader:
+                try:
+                    if candidates.get[row[1]]:
+                        pass
+                    else:
+                        candidate = row[1]
+                        values = {}
+                        values['notations'] = [row[1]]
+                        values['']
+                except ValueError:
+                    pass
