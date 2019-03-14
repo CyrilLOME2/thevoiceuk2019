@@ -48,10 +48,6 @@ def concatenateCSVs(filePath, fileNames):
                         print(tweet_info)
                         writer.writerow(tweet_info)                        
                         
-fileNames = ['tweets_2019-01-04_2019-01-30.csv', 'tweets_us_2014-02-22_2014-05-22.csv', 'tweets_us_2013-09-23_2013-12-17.csv', 'tweets_us_2013-03-23_2013-06-20.csv']
-filePath = "data_scrapping/"
-
-# concatenateCSVs(filePath, fileNames)
 
 class SentencesIterator(object):
     """Iterator to go through the lines of a text file. The file must be constructed of one sentence by line.
@@ -93,12 +89,6 @@ def read_input(input_file):
             # text
             yield gensim.utils.simple_preprocess(line)
             
-            
-# sentences = SentencesIterator('data_scrapping/tweets_2019-01-04_2019-01-30.csv')
-#sentences = SentencesIterator('data_scrapping/total_tweets.csv')
-sentences = SentencesIterator('Cleaned/tweets_2017-01-05_2017-04-10_clean.csv')
-# sentences = read_input('data_scrapping/OpinRank-master.zip')
-
 # --------------------------------------------------------------------------------------------
 #           TRAINING & SAVING DIFFERENT MODELS
 # --------------------------------------------------------------------------------------------
@@ -127,12 +117,14 @@ def create_model():
     # model7 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, size=300, workers=4)
     # model7.save('model7')
     
-    # model8 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, window=7, size=300, workers=4)
-    # model8.save('model8')
+    model8 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, window=7, size=300, workers=4)
+    model8.save('model8')
     
-    model = gensim.models.Word2Vec.load('model8')
-    return model
+    return model8
 
+def load_model(modelName):
+    model = gensim.models.Word2Vec.load(modelName)
+    return model
 # --------------------------------------------------------------------------------------------
 #           TESTING THE MODEL
 # --------------------------------------------------------------------------------------------
@@ -218,19 +210,25 @@ def apply_model_to_csv(filePath, fileName, modelTweetsFilePath, modelTweetsFileN
                 if not firstLine:
                     tweet_info = {}
                     tweet_info['id_tweet'] = row[0]
-                    tweet_info['id_candidate'] = row[1]
-                    tweet_info['sum_rt_like_com'] = row[1]
+                    tweet_info['id_candidate'] = row[3]
+                    # tweet_info['content'] = row[1]
+                    tweet_info['score_importance'] = row[2]
+                    tweet_info['nb_smiley_happy'] = row[4]
+                    tweet_info['nb_smiley_unhappy'] = row[5]
+                    
+                    tweet_content = row[1]
                     
                     count = 0
                     with open(modelTweetsFilePath + modelTweetsFileName, encoding="utf8") as modelTweetsFile:
                         modelTweetsCsvReader = csv.reader(modelTweetsFile, delimiter=',')
                         for row2 in modelTweetsCsvReader:
                             if count > 0:
-                                tweet_info['w2v_' + str(count-1)] = apply_model_to_sentence(row[2], row2[1], model)
+                                tweet_info['w2v_' + str(count-1)] = apply_model_to_sentence(tweet_content, row2[1], model)
                             count +=1
                         
                     if writeHeaders:
-                        fieldNames = ["id_tweet", "id_candidate", "sum_rt_like_com"] + ['w2v_' + str(i-1) for i in range(1, count)]
+                        #fieldNames = ["id_tweet", "content", "score_importance", "id_candidate", "nb_smiley_happy", "nb_smiley_unhappy"] + ['w2v_' + str(i-1) for i in range(1, count)]
+                        fieldNames = ["id_tweet", "id_candidate", "score_importance", "nb_smiley_happy", "nb_smiley_unhappy"] + ['w2v_' + str(i-1) for i in range(1, count)]
                         writer = csv.DictWriter(resultFile, fieldnames=fieldNames)
                         writer.writeheader()
                         writeHeaders = False
@@ -244,9 +242,6 @@ def test_apply_model_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelT
     #apply_model_to_csv('data_scrapping/', 'total_tweets.csv', model)
     #apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', model)
     apply_model_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFileName, model)
-
-model = create_model()
-apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', model)
 
 
 # --------------------------------------------------------------------------------------------
@@ -265,12 +260,14 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
                     tweet_info = {}
                     tweet_info['id_tweet'] = row[0]
                     tweet_info['id_candidate'] = row[1]
-                    tweet_info['sum_rt_like_com'] = row[2]
+                    tweet_info['score_importance'] = row[2]
+                    tweet_info['nb_smiley_happy'] = row[3]
+                    tweet_info['nb_smiley_unhappy'] = row[4]
                     
-                    tweetW2VTensor = torch.zeros(len(row) - 3)
+                    tweetW2VTensor = torch.zeros(len(row) - 5)
 
-                    for i in range(3, len(row)):
-                        tweetW2VTensor[i-3] = float(row[i])
+                    for i in range(5, len(row)):
+                        tweetW2VTensor[i-5] = float(row[i])
                         
                     sortedTweetW2VTensor, indices = torch.sort(tweetW2VTensor, descending=False)
                     knnIndices = indices[0:K]
@@ -289,11 +286,11 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
 
                         for i in range(0, K):
                             index = knnIndices[i]
-                            tweet_info['notation_' + str(i)] = notationsList[index]
+                            tweet_info['notation_' + str(i+1)] = notationsList[index]
     
 
                     if writeHeaders:
-                        fieldNames = ["id_tweet", "id_candidate", "sum_rt_like_com"] + ['notation_' + str(i) for i in range(0, K)]
+                        fieldNames = ["id_tweet", "id_candidate", "score_importance"] + ["notation_" + str(i+1) for i in range(0, K)] + ["nb_smiley_happy", "nb_smiley_unhappy"]
                         writer = csv.DictWriter(resultFile, fieldnames=fieldNames)
                         writer.writeheader()
                         writeHeaders = False
@@ -302,27 +299,22 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
                     
                 firstLine = False
                 
-#apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 1)
-apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 3)
+                
+if __name__ == "__main__":
+    fileNames = ['tweets_2019-01-04_2019-01-30.csv', 'tweets_us_2014-02-22_2014-05-22.csv', 'tweets_us_2013-09-23_2013-12-17.csv', 'tweets_us_2013-03-23_2013-06-20.csv']
+    filePath = "data_scrapping/"
+    
+    # concatenateCSVs(filePath, fileNames)
+                    
+    # sentences = SentencesIterator('data_scrapping/tweets_2019-01-04_2019-01-30.csv')
+    #sentences = SentencesIterator('data_scrapping/total_tweets.csv')
+    sentences = SentencesIterator('Cleaned/tweets_2017-01-05_2017-04-10_clean.csv')
+    # sentences = read_input('data_scrapping/OpinRank-master.zip')
+    
+    model = create_model()
+    # apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', model)
+    apply_model_to_csv('Cleaned/', 'tweets_2019-01-04_2019-01-30_clean.csv', 'Cleaned/', 'test.csv', model)
 
-
-# --------------------------------------------------------------------------------------------
-#           FINAL NOTATION CALCUL
-# --------------------------------------------------------------------------------------------
-
-def calculate_final_notation(fileDirectory, fileName):
-    with open(fileDirectory + 'final_notation-' + fileName, 'w', newline='', encoding="utf8") as resultFile:
-        with open(fileDirectory + fileName, encoding="utf8") as fileToRead:
-            csvReader = csv.reader(fileToRead, delimiter=',')
-            candidates = {}
-            for row in csvReader:
-                try:
-                    if candidates.get[row[1]]:
-                        pass
-                    else:
-                        candidate = row[1]
-                        values = {}
-                        values['notations'] = [row[1]]
-                        values['']
-                except ValueError:
-                    pass
+    #apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 1)
+    #apply_knn_to_csv('Cleaned/', 'results-tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', 3)
+    apply_knn_to_csv('Cleaned/', 'results-tweets_2019-01-04_2019-01-30_clean.csv', 'Cleaned/', 'test.csv', 5)
