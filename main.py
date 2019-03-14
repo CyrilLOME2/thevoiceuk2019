@@ -7,9 +7,9 @@ This scipt will import all the functions that have been done during to project t
 from data srapping to the final ranking.
 
 """
-from tweets_scrap import *
+from data_scrapping.tweets_scrap import *
 from algo_final import *
-# from notation import *
+from notation import *
 from Pretraitement import *
 
 print('coucou')
