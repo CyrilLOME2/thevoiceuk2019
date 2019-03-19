@@ -92,7 +92,7 @@ def read_input(input_file):
 # --------------------------------------------------------------------------------------------
 #           TRAINING & SAVING DIFFERENT MODELS
 # --------------------------------------------------------------------------------------------
-def create_model():
+def create_model(sentences, modelName):
     bigram_transformer = gensim.models.Phrases(sentences)
     
     """model1 = gensim.models.Word2Vec(sentences)
@@ -118,7 +118,7 @@ def create_model():
     # model7.save('model7')
     
     model8 = gensim.models.Word2Vec(bigram_transformer[sentences], min_count=1, window=7, size=300, workers=4)
-    model8.save('model8')
+    model8.save(modelName)
     
     return model8
 
@@ -311,7 +311,7 @@ if __name__ == "__main__":
     sentences = SentencesIterator('Cleaned/tweets_2017-01-05_2017-04-10_clean.csv')
     # sentences = read_input('data_scrapping/OpinRank-master.zip')
     
-    model = create_model()
+    model = create_model(sentences, "model_x")
     # apply_model_to_csv('Cleaned/', 'tweets_2017-01-05_2017-04-10_clean.csv', 'Cleaned/', 'test.csv', model)
     apply_model_to_csv('Cleaned/', 'tweets_2019-01-04_2019-01-30_clean.csv', 'Cleaned/', 'test.csv', model)
 
