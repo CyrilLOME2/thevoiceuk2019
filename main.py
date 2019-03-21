@@ -12,8 +12,6 @@ from algo_final import *
 from notation import *
 from Pretraitement import *
 
-print('coucou')
-
 
 # -----------------------------------------------------------------------------
 #           WORD2VEC (W2V) MODEL Creation
@@ -63,6 +61,8 @@ apply_model_to_csv(tweetsToEvaluateFilePath, tweetsToEvaluateFileName, modelTwee
 #   - modelTweetsFileName be the name of the file containing the labelled tweets for W2V comparison
 #   - K be the K attribute of the KNN algorithm
 
+K = 5
+
 tweetsToEvaluateFilePath = "\Cleaned"
 tweetsToEvaluateFileName = "results-cleaned_tweets.csv"
 
@@ -73,3 +73,18 @@ apply_knn_to_csv(tweetsToEvaluateFilePath, tweetsToEvaluateFileName, modelTweets
 
 # Then you will have a csv created at the same directory as the tweets to evaluate. This csv has the same name with "knn-" prepended.
 
+# -----------------------------------------------------------------------------
+#                    Time set a mark to the tweets
+# -----------------------------------------------------------------------------
+
+path_input = "Cleaned/" + str(K) + "nn-results-cleaned_tweets.csv"
+path_output = "Results/mark-tweets.csv"
+write_csv_calculated_marks(path_input, path_output)
+
+# -----------------------------------------------------------------------------
+#                       Time know who has won
+# -----------------------------------------------------------------------------
+
+path_input = "Results\mark-tweets.csv"
+path_output = "Results\ranking-tweets.csv"
+write_csv_calculating_ranking(path_input, path_output)
