@@ -3,11 +3,11 @@ Created the 14/03/2019
 
 @author: All team members from for #thevoiceuk project
 
-This script will import all the functions that have been done during to project to build the whiole data pipeline
+This script will import all the functions that have been done during to project to build the whole data pipeline
 from data srapping to the final ranking.
 
 """
-from data_scrapping.tweets_scrap import *
+#from data_scrapping.tweets_scrap import *
 from algo_final import *
 from notation import *
 from Pretraitement import *

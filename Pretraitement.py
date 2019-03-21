@@ -4,8 +4,6 @@ import re
 import os
 from math import log
 
-#emoji = open('emoji.txt','w', encoding = "utf-8")
-
 
 def importCoachs ():
     f = open("coachs.txt","r", encoding = 'utf-8')
@@ -132,11 +130,9 @@ def clean_file (path, filename):
 
 def CLEAN_DIR (path):
     """Nettoie tous les tweets d'un dossier"""
+    Lcoach = importCoachs()
     for filename in os.listdir(path):
         if filename.endswith(".csv"):
             Data = read_csv_unknown(path, filename)
-            trim_data(Data, filename[:-4]+"_clean.csv")
-    try :
-        emoji.close()
-    except :
-        pass
+            trim_data(Data, filename[:-4]+"_clean.csv", Lcoach)
+
