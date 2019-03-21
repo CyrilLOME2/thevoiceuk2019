@@ -54,7 +54,7 @@ def write_csv_calculating_ranking(path_input, path_output):
     with open(path_input) as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            score = log(int(row["sum_rt_com_like"]) + 2) * (float(row["note"]) - 2.5)
+            score = log(int(row["sum_rt_com_like"]) + 2) * (float(row["note"]))
             if row["id_candidat"] not in score_candidate:
                 score_candidate[row["id_candidat"]] = score
             else :
