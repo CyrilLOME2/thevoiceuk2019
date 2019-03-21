@@ -71,7 +71,7 @@ def write_csv_calculating_ranking(path_input, path_output):
                 max_candidate = candidate
         list_score_canidate.append(
             {'ranking' : rank,
-             'candidate' : max_candidate,
+             'candidate' : id_candidate_to_candidate(max_candidate),
              'score' : score_candidate[candidate]})
         del score_candidate[max_candidate]
     with open(path_output, 'w', newline='') as csvfile:
@@ -81,7 +81,13 @@ def write_csv_calculating_ranking(path_input, path_output):
         for csv_score in list_score_canidate:
             writer.writerow(csv_score)
 
-
+def id_candidate_to_candidate(id):
+    fcandidate = open('Cadidate2019.txt', 'r', encoding = 'utf-8')
+    Lcandidate = fcandidate.readlines()
+    fcandidate.close()
+    return(Lcandidate[int(id)].rstrip())
+    
+    
 if __name__ == '__main__':
 
     path_input = "template/5nn-results-tweets_2019-01-04_2019-01-30_clean.csv"
