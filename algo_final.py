@@ -61,6 +61,7 @@ def write_csv_calculating_ranking(path_input, path_output):
                 score_candidate[row["id_candidat"]] += score
     list_score_canidate = []
     rank = 0
+    
     while score_candidate != {}:
         rank += 1
         max_candidate = None
@@ -72,8 +73,9 @@ def write_csv_calculating_ranking(path_input, path_output):
         list_score_canidate.append(
             {'ranking' : rank,
              'candidate' : id_candidate_to_candidate(max_candidate),
-             'score' : score_candidate[candidate]})
+             'score' : score_candidate[max_candidate]})
         del score_candidate[max_candidate]
+        
     with open(path_output, 'w', newline='') as csvfile:
         fieldnames = ['ranking', 'candidate', 'score']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
