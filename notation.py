@@ -278,7 +278,7 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
 
                         for row2 in resultFileReader:
                             try:
-                                notationsList += [int(row2[2])]
+                                notationsList += [float(row2[2])]
                             except ValueError:
                                 pass
                             
@@ -286,7 +286,10 @@ def apply_knn_to_csv(fileDirectory, fileName, modelTweetsFilePath, modelTweetsFi
 
                         for i in range(0, K):
                             index = knnIndices[i]
-                            tweet_info['notation_' + str(i+1)] = notationsList[index]
+                            try:
+                                tweet_info['notation_' + str(i+1)] = notationsList[index]
+                            except IndexError as e:
+                                print(index, len(notationsList))
     
 
                     if writeHeaders:

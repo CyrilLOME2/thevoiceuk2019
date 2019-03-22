@@ -17,7 +17,7 @@ def write_csv_calculated_marks(path_input, path_output):
             csv_notes['sum_rt_com_like'] = row['score_importance']
             sum_mark = 0
             for i in range(1,6):
-                sum_mark += int(row['notation_' + str(i)])
+                sum_mark += float(row['notation_' + str(i)])
             if row['nb_smiley_happy'] == '0' and row['nb_smiley_unhappy'] == '0':
                 csv_notes['note'] = sum_mark / 5
             else :
