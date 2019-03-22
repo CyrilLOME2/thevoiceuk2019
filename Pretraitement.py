@@ -104,7 +104,7 @@ def trim_data (Data,name_new_file = file[:-4]+"_clean.csv", Lcoach = []):
     """Epure les tweets, donne le score d'importance et écrit dans le fichier"""
     # tweet_id,user_id,user_pseudo,user_name,date_and_time,content,nb_replies,nb_retweets,nb_jaime
     print(name_new_file)
-    if '2019' in name_new_file :
+    if '2019' in name_new_file or 'evaluate' in name_new_file :
         fcandidate = open('Cadidate2019.txt', 'r', encoding = 'utf-8')
         Lcandidate = fcandidate.readlines()
         fcandidate.close()
