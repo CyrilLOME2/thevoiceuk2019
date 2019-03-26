@@ -1,0 +1,11 @@
+id_tweet,id_candidat,sum_rt_com_like,note
+1,candidate_1,1,4.4
+2,candidate_2,3,2.6666666666666665
+3,candidate_1,1,4.833333333333333
+4,candidate_3,6,4.166666666666667
+5,candidate_3,2,2.8
+6,candidate_1,3,4.2
+7,candidate_4,5,4.2
+8,candidate_4,2,4.0
+9,candidate_2,3,3.4
+10,candidate_1,5,4.333333333333333

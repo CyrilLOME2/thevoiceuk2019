@@ -1,0 +1,11 @@
+id_tweet,id_candidat,sum_rt_com_like,note_proche_voisin_1,note_proche_voisin_2,note_proche_voisin_3,note_proche_voisin_4,note_proche_voisin_5,smiley_happy,smiley_unhappy
+1,candidate_1,1,4,5,5,3,5,0,0
+2,candidate_2,3,2,3,3,3,3,0,1
+3,candidate_1,1,4,5,5,5,5,2,0
+4,candidate_3,6,5,4,4,3,5,1,0
+5,candidate_3,2,1,3,4,3,3,0,0
+6,candidate_1,3,4,4,5,4,4,0,0
+7,candidate_4,5,4,4,5,4,4,0,0
+8,candidate_4,2,5,3,4,4,4,0,0
+9,candidate_2,3,3,3,3,4,4,0,0
+10,candidate_1,5,4,4,5,4,4,5,0
