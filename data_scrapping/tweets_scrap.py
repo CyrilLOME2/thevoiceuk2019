@@ -46,7 +46,7 @@ def scrap_general(date_debut, date_fin):
     print('Between ' + date_1 + ' and ' + date_2)
 
     # creating selenium driver
-    binary = FirefoxBinary(r'C:\Program Files (x86)\Mozilla Firefox\firefox.exe')
+    binary = FirefoxBinary(r'C:\Program Files\Mozilla Firefox\firefox.exe')
     executable_path = r'C:\Users\theop\Documents\Cours\Projet Option\thevoiceuk2019\data_scrapping\geckodriver.exe'
     driver = webdriver.Firefox(firefox_binary=binary, executable_path=executable_path)
 
