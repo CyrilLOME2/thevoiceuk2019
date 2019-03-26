@@ -15,6 +15,18 @@ Afin de faire exécuter notre projet sur votre machine, il faut :
 
 ## Algorithme de data-scrapping
 
+L'algorithme de Data Scraping est le point de départ du projet. Son but est de récolter tous les tweets avec le hashtag #TheVoiceUK entre deux date *date1* et *date2*. Pour le lancer, il suffit d'aller dans le dossier */data_scrapping* et de lancer *tweets_scrap.py*. L'algorithme va alors demander les deux dates sous un certain format. Une fois les deux dates données, le driver Geckodriver va naviguer sur Firefox et parcourir le code HTML afin d'avoir les informations nécessaires. En sortie, l'algorithme va inscrire l'ensemble de ces informations dans un fichier csv dans  */data_scrapping* intitulé *tweets_date1_date2.csv*. 
+
+Ce fichier va contenir les informations suivantes : id du tweet, id du user, pseudo, nom du user, date et heure, contenu du tweet, nombre de commentaires, nombre de retweets, nombre de mentions j'aime. 
+
+Il peut être utilisé pour tout type de recherche de tweets sur twitter entre 2 dates. Il suffit d'aller sur <https://twitter.com/search-advanced?lang=en>, de faire sa recherche entre les deux dates. Vous allez être redirigés vers twitter. Copiez l'URL et remplacez cette ligne de code :
+
+```python
+link = 'https://twitter.com/search?l=&q=%23thevoiceuk%20since%3A' + date_1 + '%20until%3A' + date_2 + '&src=typd'
+```
+
+par votre URL, en veillant à bien mettre date_1 et date_2 au bon endroit.
+
 ## Algorithme de prétraitement
 
 ## Utilisation du framework Word2Vec
