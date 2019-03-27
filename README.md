@@ -66,7 +66,7 @@ A partir du CSV construit juste ci-dessus, on peut maintenant trouver les K twee
 ## Algorithme final
 L'algorithme final prend l'ensemble des tweets notés issus de l'algorithme de notation et applique la formule suivante, pour chaque candidat :
 
-Score(candidat) = somme{t in tweets(candidate)} [ (5 * note(t) + smileys(t)) * log(puissance(t)) / 6 ]
+Score(candidat) = somme_{t in tweets(candidate)} [ (5 * note(t) + smileys(t)) * log(puissance(t)) / 6 ]
 
 où puissance(t) = commentaires(t) + likes(t) + retweets(t)
 
