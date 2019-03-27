@@ -8,9 +8,9 @@ Dans l'idée, nous avons dans un premier temps récupéré des tweets ayant de h
 ## Requirements
 
 Afin de faire exécuter notre projet sur votre machine, il faut :
-- Installer le module python Gensim (https://pypi.org/project/gensim/)
-- Installer le module python Selenium (https://www.seleniumhq.org/download/)
-- Installer le module python Pytorch (https://pytorch.org/)
+- Installer le module python `Gensim` (https://pypi.org/project/gensim/)
+- Installer le module python `Selenium` (https://www.seleniumhq.org/download/)
+- Installer le module python `Pytorch` (https://pytorch.org/)
 
 ## Structure générale du projet
 
@@ -46,7 +46,20 @@ par votre URL, en veillant à bien mettre date_1 et date_2 au bon endroit.
 
 ## Utilisation du framework Word2Vec
 
+Le framework Word2Vec est importé à travers le module python `Gensim`. Il permet de créer des modèles qui font correspondre à des mots des vecteurs, de par leurs voisins fréquents dans un texte. Ainsi, la représentation d'un mot par W2V est calculée en fonction des mots qui l'entourent le plus souvent. Deux mots similaires arrivant généralement entre les mêmes mots, ils auront donc une représentation vectorielle similaire.
+
+De là, on peut représenter une phrase comme la moyenne des vecteurs de ses mots. Deux phrases pourront être comparées en prenant la valeur absolue de la différence entre leurs vecteurs.
+
+Dans notre projet, nous entraînons un modèle Word2Vec avec 3723 tweets (phrases) issus des éditions 2014 à aujourd'hui de The Voice UK et The Voice US. Un mot est représenté par un vecteur de taille 300 et Word2Vec parcourt chaque phrase avec une fenêtre de 7 mots pour étudier un mot.
+
 ## Algorithme de notation
+
+L'algorithme de notation s'effectue en deux temps :
+
+### 1. Application du modèle Word2Vec
+
+
+### 2. Application d'un algorithme de KNN
 
 ## Algorithme final
 
