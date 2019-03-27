@@ -11,6 +11,7 @@ Afin de faire exécuter notre projet sur votre machine, il faut :
 - Installer le module python `Gensim` (https://pypi.org/project/gensim/)
 - Installer le module python `Selenium` (https://www.seleniumhq.org/download/)
 - Installer le module python `Pytorch` (https://pytorch.org/)
+- Télécharger le `GeckoDriver` (https://github.com/mozilla/geckodriver/releases) et le placer dans la directory `data_scrpping\tweets_scrap.py`
 
 ## Structure générale du projet
 
