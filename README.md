@@ -54,12 +54,19 @@ Dans notre projet, nous entraînons un modèle Word2Vec avec 3723 tweets (phrase
 
 ## Algorithme de notation
 
-L'algorithme de notation s'effectue en deux temps :
+### 0. Labellisation de tweets
+Pour la suite, on aura besoin de tweets possédant déjà un note d'avis, afin d'utiliser un algorithme à apprentissage supervisé. Ainsi, dans la directory `Labelled`, nous avons construit un fichier au format CSV contenant des tweets et les notes (que nous avons entrées à la main selon notre propre jugement) correspondantes. Nous avons 200 tweets labellisés. L'algorithme de notation s'effectue alors en deux temps :
 
 ### 1. Application du modèle Word2Vec
-
+On compare le tweet aux 200 tweets labellisés, selon le modèle Word2Vec. On construit ainsi un fichier CSV de la même forme, mais chaque tweet possède en plus 200 nouvelles colones : chacune contient la similarité W2V avec l'un des tweets labellisés.
 
 ### 2. Application d'un algorithme de KNN
+A partir du CSV construit juste ci-dessus, on peut maintenant trouver les K tweets labellisés les plus proches de chaque tweets. En prenant la moyenne des notes de ces K tweets labellisés les plus proches, on peut donner une note à chacun des tweets. On enregistre les résultats dans un fichier CSV.
 
 ## Algorithme final
+L'algorithme final prend l'ensemble des tweets notés issus de l'algorithme de notation et applique la formule suivante, pour chaque candidat :
+
+Score(candidat) = \sum_{t in tweets(candidate)} (\frac{5}{6} * note(t) + \frac{1}{6} * smileys(t)) * log(puissance(t))
+
+où puissance(t) = commentaires(t) + likes(t) + retweets(t)
 
