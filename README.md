@@ -10,8 +10,23 @@ Dans l'idée, nous avons dans un premier temps récupéré des tweets ayant de h
 Afin de faire exécuter notre projet sur votre machine, il faut :
 - Installer le module python Gensim (https://pypi.org/project/gensim/)
 - Installer le module python Selenium (https://www.seleniumhq.org/download/)
+- Installer le module python Pytorch (https://pytorch.org/)
 
 ## Structure générale du projet
+
+Le projet est consistué de cinq scripts python :
+- `data_scrpping\tweets_scrap.py` effectue le data-scrapping
+- `Pretraitement.py` traite les données issues du data-scrapping pour les rendre utilisables
+- `notation.py` traite les données en calculant une note pour chaque tweet
+- `algo_final.py` fait la synthèse des tweets notés pour trouver le classement des candidats
+- `main.py` fait tourner l'ensemble de l'algorithme en appelant les méthodes définies dans les scripts ci-dessus
+
+Le projet est également divisé en plusieurs directories :
+- la directory de base contient la plupart des scripts python, les fichiers statiques ainsi que le modèle Word2Vec construit
+- la directory `data_scrapping` contient tous les résultats des étapes de data-scrapping
+- la directory `Cleaned` contient l'ensemble des fichiers de tweets pré-traités
+- la directory `Labelled` contient les tweets labellisés servant aux modèles W2V et KNN
+- la directory `Results` contient les résultats finaux de l'exécution de notre projet
 
 ## Algorithme de data-scrapping
 
