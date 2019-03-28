@@ -16,7 +16,7 @@ Afin de faire exécuter notre projet sur votre machine, il faut :
 ## Structure générale du projet
 
 Le projet est consistué de cinq scripts python :
-- `data_scrpping\tweets_scrap.py` effectue le data-scrapping
+- `data_scrapping\tweets_scrap.py` effectue le data-scrapping
 - `Pretraitement.py` traite les données issues du data-scrapping pour les rendre utilisables
 - `notation.py` traite les données en calculant une note pour chaque tweet
 - `algo_final.py` fait la synthèse des tweets notés pour trouver le classement des candidats
