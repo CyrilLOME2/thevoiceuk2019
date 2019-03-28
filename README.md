@@ -64,6 +64,8 @@ De là, on peut représenter une phrase comme la moyenne des vecteurs de ses mot
 
 Dans notre projet, nous entraînons un modèle Word2Vec avec 3723 tweets (phrases) issus des éditions 2014 à aujourd'hui de The Voice UK et The Voice US. Un mot est représenté par un vecteur de taille 300 et Word2Vec parcourt chaque phrase avec une fenêtre de 7 mots pour étudier un mot.
 
+Pour prendre en main Word2Vec de Gensim sous python, nous avons utilisé le tutoriel de Radim Řehůřek (https://rare-technologies.com/word2vec-tutorial/)
+
 ## Algorithme de notation
 
 ### 0. Labellisation de tweets
