@@ -31,7 +31,7 @@ Le projet est également divisé en plusieurs directories :
 
 ## Algorithme de data-scrapping
 
-L'algorithme de Data Scraping est le point de départ du projet. Son but est de récolter tous les tweets avec le hashtag #TheVoiceUK entre deux date *date1* et *date2*. Pour le lancer, il suffit d'aller dans le dossier */data_scrapping* et de lancer *tweets_scrap.py*. L'algorithme va alors demander les deux dates sous un certain format. Une fois les deux dates données, le driver Geckodriver va naviguer sur Firefox et parcourir le code HTML afin d'avoir les informations nécessaires. En sortie, l'algorithme va inscrire l'ensemble de ces informations dans un fichier csv dans  */data_scrapping* intitulé *tweets_date1_date2.csv*. 
+L'algorithme de Data Scraping est le point de départ du projet. Son but est de récolter tous les tweets avec le hashtag #TheVoiceUK entre deux dates *date1* et *date2*. Pour le lancer, il suffit d'aller dans le dossier */data_scrapping* et de lancer *tweets_scrap.py*. L'algorithme va alors demander les deux dates sous un certain format. Une fois les deux dates données, le driver Geckodriver va naviguer sur Firefox et parcourir le code HTML afin d'avoir les informations nécessaires. En sortie, l'algorithme va inscrire l'ensemble de ces informations dans un fichier csv dans  */data_scrapping* intitulé *tweets_date1_date2.csv*. 
 
 Ce fichier va contenir les informations suivantes : id du tweet, id du user, pseudo, nom du user, date et heure, contenu du tweet, nombre de commentaires, nombre de retweets, nombre de mentions j'aime. 
 
@@ -44,6 +44,17 @@ link = 'https://twitter.com/search?l=&q=%23thevoiceuk%20since%3A' + date_1 + '%2
 par votre URL, en veillant à bien mettre date_1 et date_2 au bon endroit.
 
 ## Algorithme de prétraitement
+
+L'algorithme de *Prétraiment.py* est en charge du tri préliminaire des tweets ainsi que de la correction et l'adaptation du contenu du tweeet au processing Word2Vec. On retrouve dans ce fichier des fonctions d'import de la liste des coachs, mais aussi *read_csv_unknown*, qui est une fonction d'import de tweet qui supprime déjà les caractères trop étranges qui faisaient planter l'algorithme. Ensuite, on envoie ces données importées dans *trim_data* qui gère la mise en place du score d'importance ainsi que l'écriture sur le fichier cleaned. Cependant, avant d'écrire la version "cleaned", il faut passer le tweet dans la fonction *trim_tweet*.
+
+La fonction *trim_tweet* s'occupe de :
+  - supprimer les mots sans sens (les #hashtags, les liens internets, ...)
+  - analyser les identifications, avec les coachs, les candidats 2019 si les données sont de 2019...
+  - rejeter les mauvais tweets (tweets sans candidat, trop courts, ayant des accents/caractères étrangers...)
+  - trouver les smileys, ou emojis, et donner le score correspondant
+  - rendre le tweet facile à macher pour Word2Vec par la suite
+ 
+ Enfin, on peut utiliser les fonctions valises *clean_file* et *CLEAN_DIR* qui permettent de "clean" respectivement un fichier csv, ou l'intégralité des csv d'un dossier.
 
 ## Utilisation du framework Word2Vec
 
