@@ -1,5 +1,5 @@
 # The Voice UK 2019
-Nous sommes 3 élèves de l'Ecole Centrale de Lyon en option informatique : Cyril Lome, Denis Guibert et Théo Ponton. Le but de notre projet est de determiner le gagnant de The Voice UK 2019 à travers une analyse de tweets. 
+Nous sommes 3 élèves de l'Ecole Centrale de Lyon en Option Informatique : Cyril Lome, Denis Guibert et Théo Ponton. Le but de notre projet est de determiner le gagnant de The Voice UK 2019 à travers une analyse de tweets. Ce projet s'inscrit dans la formation de Semestre 9 et a été encadré par l'enseignant-chercheur de l'ECL Alexandre SAIDI.
 
 ## Résumé
 
